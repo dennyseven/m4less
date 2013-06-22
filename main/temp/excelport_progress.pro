@@ -1,0 +1,1 @@
+{"error":false,"message":"","percent":100,"done":true,"current":110,"all":-1,"finishedImport":true,"importingFile":"excelport_export_2013-03-29_20-11-36.xlsx","populateAll":true,"importedCount":0}

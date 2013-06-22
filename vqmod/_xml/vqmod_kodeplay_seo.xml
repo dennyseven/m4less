@@ -1,0 +1,247 @@
+<modification>
+	<id>opencart seo changes Changes</id>
+	<version>1.0.0</version>
+	<vqmver>2.1</vqmver>
+	<author>Jimit</author>
+<file name="admin/controller/common/header.php">
+		<operation error="abort">
+			<search position="before">
+				<![CDATA[
+						$this->data['text_zone']
+				       	]]>
+			</search>
+			<add>
+				<![CDATA[		
+				$this->data['text_seo'] = $this->language->get('text_seo');
+				$this->data['text_customize'] = $this->language->get('text_customize');
+				$this->data['text_auto_generate'] = $this->language->get('text_auto_generate');
+				]]>
+			</add>
+		</operation>
+		<operation error="abort">
+			<search position="before">
+				<![CDATA[
+				$this->data['zone']
+				]]>
+			</search>
+			<add><![CDATA[			
+				$this->data['customize'] = $this->url->link('catalog/seo/customize','token=' . $this->session->data['token']);
+				$this->data['auto_generate'] = $this->url->link('catalog/seo/autogenerate','token=' . $this->session->data['token']);
+				]]>
+			</add>
+		</operation>
+	</file>
+	<file name="admin/language/*/common/header.php">
+		<operation error="abort">
+			<search position="before"><![CDATA[
+				$_['text_zone']
+				]]>
+			</search>
+			<add>
+				<![CDATA[
+				$_['text_seo']              = 'SEO';
+				$_['text_customize']        = 'Customize';
+				$_['text_auto_generate']    = 'Auto Generate';
+				]]>
+			</add>
+		</operation>
+	</file>
+	<file name="admin/view/template/common/header.tpl">
+		<operation error="abort">
+			<search position="after"><![CDATA[
+				<li><a href="<?php echo $information; ?>"><?php echo $text_information; ?></a></li>
+				]]>
+			</search>
+			<add><![CDATA[          
+				<li><a class="parent"><?php echo $text_seo; ?></a>
+				            <ul>
+				                <li><a href="<?php echo $customize ; ?>"><?php echo $text_customize;?></a></li>
+				                <li><a href="<?php echo $auto_generate ; ?>"><?php echo $text_auto_generate;?></a></li>
+				            </ul>
+				        </li>
+				]]>
+			</add>
+		</operation>
+		<operation error="abort">
+			<search position="before"><![CDATA[
+			</head>
+			]]>
+			</search>
+			<add><![CDATA[  
+			<style type="text/css">
+				.button_tabs {
+						    float: right;
+						    margin-bottom: 15px;
+						    margin-right: 5px;
+						}
+
+						.clear {
+						    clear: both;
+						}
+
+						.hidden {
+							display: none;
+						}
+
+						.helper-msg {
+							background: #fff2c2;
+							border: 1px dotted orange;
+							width: 96%;
+							margin: 0 auto;
+							margin-top: 20px;
+							margin-bottom: 20px;
+							padding: 10px 1%;
+							text-align: left;
+							font-size: 15px;
+							line-height: 25px;
+						}
+			</style>   
+				]]>
+			</add>
+		</operation>
+	</file>
+
+	<file name="catalog/controller/common/seo_url.php">
+		<operation error="abort">
+			<search position="before"><![CDATA[
+				if ($url[0] == 'information_id') {
+				]]>
+			</search>
+			<add><![CDATA[          
+				if($url[0] == 'route') {
+						$this->request->get['route'] = $url[1];
+					}
+				]]>
+			</add>
+		</operation>
+
+		<operation error="abort">
+			<search position="before"><![CDATA[
+					if ($url) {
+				]]>
+			</search>
+			<add><![CDATA[ 
+            foreach ($data as $key => $value) {
+            
+				if (isset($data['route'])) {
+				
+				    if($key = 'route') {
+				    	$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "url_alias` WHERE `query` = 'route=" . $this->db->escape($value) . "'");
+				    	if($query->num_rows) {
+				    		$url .= '/' . $query->row['keyword'];
+				    	}
+			        }				
+			    }
+			}
+			
+				]]>
+			</add>
+		</operation>
+	</file>
+
+	<file name="system/engine/controller.php">
+		<operation error="abort">
+			<search position="after"><![CDATA[
+				protected $output;
+				]]>
+			</search>
+			<add><![CDATA[          
+				protected $post_action = array();
+				]]>
+			</add>
+		</operation>
+
+		<operation error="abort">
+			<search position="before"><![CDATA[
+				public function __set($key, $value) {
+				]]>
+			</search>
+			<add><![CDATA[          
+				public function addPostActions(array $actions) {
+					if(!is_array($actions)){
+						array($actions);
+					}
+					$this->post_action = array_merge($this->post_action, $actions);
+				}
+				]]>
+			</add>
+		</operation>
+
+		<operation error="abort">
+			<search position="after"><![CDATA[
+				protected function render()
+				]]>
+			</search>
+			<add><![CDATA[          
+				foreach ($this->post_action as $action) {
+					$front = new Front($this->registry);
+					$front->execute($action);			
+				}
+				]]>
+			</add>
+		</operation>
+	</file>
+
+	<file name="system/engine/front.php">
+		<operation error="abort">
+			<search position="after"><![CDATA[
+				protected $pre_action = array();
+				]]>
+			</search>
+			<add><![CDATA[          
+				protected $post_action = array();
+				]]>
+			</add>
+		</operation>
+
+		<operation error="abort">
+			<search position="before"><![CDATA[
+				public function dispatch($action, $error) {
+				]]>
+			</search>
+			<add><![CDATA[          
+				public function addPostAction($post_action) {
+							$this->post_action[] = $post_action;
+						}
+				]]>
+			</add>
+		</operation>
+
+		<operation error="abort">
+			<search position="after"><![CDATA[
+				$controller = new $class($this->registry);
+				]]>
+			</search>
+			<add><![CDATA[          
+				$controller->addPostActions($this->post_action);
+				]]>
+			</add>
+		</operation>
+
+		<operation error="abort">
+			<search position="replace"><![CDATA[
+				private function execute($action) {
+				]]>
+			</search>
+			<add><![CDATA[          
+				 public function execute($action) {
+				]]>
+			</add>
+		</operation>
+	</file>
+	<file name="system/startup.php">
+		<operation error="abort">
+			<search position="after"><![CDATA[
+				require_once(DIR_SYSTEM . 'library/template.php');
+				]]>
+			</search>
+			<add><![CDATA[          
+				require_once(DIR_SYSTEM . 'library/seo/seo.php');
+				]]>
+			</add>
+		</operation>
+	</file>
+
+
+
+</modification>

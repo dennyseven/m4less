@@ -1,0 +1,12 @@
+<modification>
+	<id><![CDATA[Restrict Anyport]]></id>
+	<version><![CDATA[1.0]]></version>
+	<vqmver><![CDATA[2.2.1]]></vqmver>
+	<author><![CDATA[iSenseLabs Team]]></author>
+	<file name="admin/view/template/catalog/product_list.tpl">
+		<operation>
+			<search position="replace"><![CDATA[<div class="buttons">]]></search>
+			<add><![CDATA[<div class="buttons"><a href="index.php?route=module/excelport&token=<?php echo $this->request->get['token']; ?>" class="button">Export / Import</a>]]></add>
+		</operation>
+	</file>
+</modification>
