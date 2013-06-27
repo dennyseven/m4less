@@ -1,0 +1,8 @@
+<modification>
+	<id>Sends and exact order mail copy to Admin and all configured alert mail addresses</id>
+    <version>1.0.0</version>
+    <vqmver>2.1.0</vqmver>
+    <author>prof.web.coding@gmail.com</author>
+	<file name="catalog/model/checkout/order.php">		<operation>			<search position="after"><![CDATA[if ($this->config->get('config_alert_mail')) {]]></search>			<add><![CDATA[				$mail->setTo($this->config->get('config_email'));				$mail->send();				// Send to additional alert emails				$emails = explode(',', $this->config->get('config_alert_emails'));								foreach ($emails as $email) {					if ($email && preg_match('/^[^\@]+@.*\.[a-z]{2,6}$/i', $email)) {						$mail->setTo($email);						$mail->send();					}				}				return;]]> </add>		</operation>
+	</file>
+</modification>
